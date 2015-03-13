@@ -10,6 +10,7 @@ from email.mime.text import MIMEText
 import configparser
 import datetime
 import os
+import logging
 
 def parse_results(search_term,min_price,max_price,must_have_image,url_prefix,title_only):
     # Craigslist search URL
@@ -26,8 +27,8 @@ def parse_results(search_term,min_price,max_price,must_have_image,url_prefix,tit
         title_only=''
     search_term = search_term.strip().replace(' ', '+')
     search_url = BASE_URL.format(search_term,min_price,max_price,must_have_image,url_prefix,title_only)
-    #logs.write('search url: {0}'.format(search_url))
-    #logs.write('')
+    #logger.info('search url: {0}'.format(search_url))
+    #logger.info('')
     soup = BeautifulSoup(urlopen(search_url).read())
     rows = soup.find('div', 'content').find_all('p', 'row')
     for row in rows:
@@ -53,11 +54,11 @@ def get_active_searches():
             cur.execute(sql)
             active_searches = cur.fetchall()
     except Exception as ex:
-        logs.write(str(ex))
+        logger.error(str(ex))
     return active_searches
 
 def interate_through_searches(active_searches):
-    logs.write('  entering loop for each search\n')
+    logger.info('  entering loop for each search')
     new_records = []
     for search in active_searches:
         try:
@@ -70,37 +71,37 @@ def interate_through_searches(active_searches):
             email =search['email']
 
         except Exception as ex:
-            logs.write("Unable to initialize search variables\n")
+            logger.info("Unable to initialize search variables")
             sys.exit(1)
         locations = get_search_locations(search_id)
-        #logs.write('locations:{0} '.format(locations))
+        #logger.info('locations:{0} '.format(locations))
         for location in locations:
             url_prefix = location['url_prefix']
-            #logs.write("Scanning craigslist for search_id: {0}".format(search_id))
+            #logger.info("Scanning craigslist for search_id: {0}".format(search_id))
             print''
             results = parse_results(keywords,min_price,max_price,must_have_image,url_prefix,title_only)
-            logs.write("  Getting results for search id: {0}, location: {1}\n".format(search_id,location['url_prefix']))
+            logger.info("  Getting results for search id: {0}, location: {1}".format(search_id,location['url_prefix']))
             print''
             new_records = get_new_records(results,search_id)
             try:
                 if len(new_records) > 0:
-                    #logs.write("Sending email\n")
+                    #logger.info("Sending email")
 
                     send_email(email,keywords,new_records)
 
-                    #logs.write('writing new records for search id: {0}'.format(search_id))
+                    #logger.info('writing new records for search id: {0}'.format(search_id))
 
                     write_results(new_records,search_id)
-                    logs.write('    records successfully saved\n')
+                    logger.info('    records successfully saved')
                 else:
                     pass
             except Exception as ex:
-                logs.write(str(ex))
-        logs.write('    {0} new records found for search id {1}\n'.format(len(new_records),search_id))
+                logger.error(str(ex))
+        logger.info('    {0} new records found for search id {1}'.format(len(new_records),search_id))
 def get_search_locations(search_id):
     con = mdb.connect(host=db_host, db=db_database, passwd=db_pass, user=db_user, port=db_port,charset='utf8', cursorclass=MySQLdb.cursors.DictCursor);
     sql = "SELECT `url_prefix` FROM v_search_locations WHERE `search_id` ={0}".format(search_id)
-    #logs.write('location sql: {0}'.format(sql))
+    #logger.info('location sql: {0}'.format(sql))
     print''
     with con:
         cur = con.cursor()
@@ -131,12 +132,12 @@ def get_new_records(results,search_id):
     for post in results:
         # do any of the already seen posts match this post?
         if any(seen_post['url'] == post['url'] for seen_post in seen_posts):
-            #logs.write("this post exists {0} ".format(post))
+            #logger.info("this post exists {0} ".format(post))
             pass
         else:
-        #   logs.write("NEW POST: {0}".format(post))
+        #   logger.info("NEW POST: {0}".format(post))
             new_records.append(post)
-        #logs.write('')
+        #logger.info('')
     return new_records
 
 
@@ -150,7 +151,7 @@ def send_email(email,keywords,new_records):
     msg['From'] = me
     msg['To'] = email
 
-    text = "Hi!\nHere is the list of new postings for: "+keywords+"\n"
+    text = "Hi!Here is the list of new postings for: "+keywords+""
     html = """\
     <html>
       <head></head>
@@ -160,15 +161,15 @@ def send_email(email,keywords,new_records):
     html=html+keywords+" <br><ul>"
            
     
-    logs.write('    building email\n')
+    logger.info('    building email')
     
     for row in new_records:
                 try:                    
-                    text = text+row['title']+": "+row['url']+"\n"
+                    text = text+row['title']+": "+row['url']+""
                     html = html+"<br><li><a href='"+row['url']+"'>"+row['title']+"</a></li>"
                     
                 except Exception as ex:
-                    logs.write(str(ex))
+                    logger.error(str(ex))
                     
     html = html+"""\
             </ul>
@@ -176,7 +177,7 @@ def send_email(email,keywords,new_records):
       </body>
     </html>
     """
-    logs.write('    done building email\n')
+    logger.info('    done building email')
     
     # Create the body of the message (a plain-text and an HTML version).
 
@@ -194,34 +195,44 @@ def send_email(email,keywords,new_records):
     # Send the message via local SMTP server.
     server = smtplib.SMTP(email_server)
     server.starttls()
-    logs.write('    logging in to smtp server\n')
+    logger.info('    logging in to smtp server')
     
     server.login(email_email,email_pass)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-    logs.write('    sending email\n')
+    logger.info('    sending email')
     
     try:
         server.sendmail(me, email, msg.as_string())
     except Exception as ex:
-        logs.write(str(ex))
-    logs.write('    email successfully sent\n')
+        logger.error(str(ex))
+    logger.info('    email successfully sent')
     server.quit()
-    logs.write('    smtp server successfully quit\n')
+    logger.info('    smtp server successfully quit')
     
 
 if __name__ == '__main__':
     start_time = time.time()
-    global logs
+    global logger
     global local_path
     global log_file
     global config_file
 
     local_path = os.path.dirname(os.path.abspath(__file__))
-    log_file = os.path.join(local_path, 'logs')
+    log_file = os.path.join(local_path, 'scraper.log')
     config_file = os.path.join(local_path, 'config.ini')
 
-    logs = open(log_file,'a')
+    logger = logging.getLogger('scraper')
+    logger.setLevel(logging.DEBUG)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # create file handler which logs even debug messages
+    fh = logging.FileHandler(log_file)
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+
     try:
 
         #get config settings
@@ -239,6 +250,8 @@ if __name__ == '__main__':
         global email_email
         global email_pass
 
+
+
         config.read(config_file)
         db_host = config.get('databaseInfo','host')
         db_database = config.get('databaseInfo','database')
@@ -251,17 +264,17 @@ if __name__ == '__main__':
         email_pass = config.get('smtpInfo','pass')
 
     except Exception as ex:
-        logs.write("Unable to get config values: {0}\n".format(ex))
+        logger.info("Unable to get config values: {0}".format(ex))
         sys.exit()
 
-    logs.write("||||||| Starting new search {0} |||||||\n".format(time.strftime("%c")))
-    logs.write("  getting active searches\n")
+    logger.info("||||||| Starting new search {0} |||||||".format(time.strftime("%c")))
+    logger.info("  getting active searches")
     active_searches = get_active_searches()
-    #logs.write(active_searches)
+    #logger.info(active_searches)
     interate_through_searches(active_searches)
     end_time = time.time()
     execute_duration = end_time - start_time
-    logs.write("Execution duration: {0} seconds\n".format(int(execute_duration)))
-    logs.write('\n\n')
-    logs.close()
+    logger.info("Execution duration: {0} seconds\n\n".format(int(execute_duration)))
+
+
 
