@@ -57,7 +57,8 @@ def get_active_searches():
     return active_searches
 
 def interate_through_searches(active_searches):
-    logs.write('enter loop for each search\n')
+    logs.write('  entering loop for each search\n')
+    new_records = []
     for search in active_searches:
         try:
             search_id=search['id']
@@ -78,24 +79,24 @@ def interate_through_searches(active_searches):
             #logs.write("Scanning craigslist for search_id: {0}".format(search_id))
             print''
             results = parse_results(keywords,min_price,max_price,must_have_image,url_prefix,title_only)
-            logs.write("Getting new records\n")
+            logs.write("  Getting results for search id: {0}, location: {1}\n".format(search_id,location['url_prefix']))
             print''
             new_records = get_new_records(results,search_id)
             try:
                 if len(new_records) > 0:
-                    logs.write("Sending email\n")
+                    #logs.write("Sending email\n")
 
                     send_email(email,keywords,new_records)
 
-                    logs.write('writing new records for search id: {0}'.format(search_id))
+                    #logs.write('writing new records for search id: {0}'.format(search_id))
 
                     write_results(new_records,search_id)
-                    logs.write('records successfully saved\n')
+                    logs.write('    records successfully saved\n')
                 else:
-                    logs.write('No new records were found\n')
+                    pass
             except Exception as ex:
                 logs.write(str(ex))
-
+        logs.write('    {0} new records found for search id {1}\n'.format(len(new_records),search_id))
 def get_search_locations(search_id):
     con = mdb.connect(host=db_host, db=db_database, passwd=db_pass, user=db_user, port=db_port,charset='utf8', cursorclass=MySQLdb.cursors.DictCursor);
     sql = "SELECT `url_prefix` FROM v_search_locations WHERE `search_id` ={0}".format(search_id)
@@ -159,7 +160,7 @@ def send_email(email,keywords,new_records):
     html=html+keywords+" <br><ul>"
            
     
-    logs.write('building email\n')
+    logs.write('    building email\n')
     
     for row in new_records:
                 try:                    
@@ -175,7 +176,7 @@ def send_email(email,keywords,new_records):
       </body>
     </html>
     """
-    logs.write('done building email\n')
+    logs.write('    done building email\n')
     
     # Create the body of the message (a plain-text and an HTML version).
 
@@ -193,20 +194,20 @@ def send_email(email,keywords,new_records):
     # Send the message via local SMTP server.
     server = smtplib.SMTP(email_server)
     server.starttls()
-    logs.write('logging in to smtp server\n')
+    logs.write('    logging in to smtp server\n')
     
     server.login(email_email,email_pass)
     # sendmail function takes 3 arguments: sender's address, recipient's address
     # and message to send - here it is sent as one string.
-    logs.write('sending email\n')
+    logs.write('    sending email\n')
     
     try:
         server.sendmail(me, email, msg.as_string())
     except Exception as ex:
         logs.write(str(ex))
-    logs.write('email successfully sent\n')
+    logs.write('    email successfully sent\n')
     server.quit()
-    logs.write('smtp server successfully quit\n')
+    logs.write('    smtp server successfully quit\n')
     
 
 if __name__ == '__main__':
@@ -248,15 +249,13 @@ if __name__ == '__main__':
         sys.exit()
 
     logs.write("||||||| Starting new search {0} |||||||\n".format(time.strftime("%c")))
-    logs.write("getting active searches\n")
+    logs.write("  getting active searches\n")
     active_searches = get_active_searches()
     #logs.write(active_searches)
-    
-    logs.write("interating through those searches now...\n")
-    
     interate_through_searches(active_searches)
     end_time = time.time()
     execute_duration = end_time - start_time
     logs.write("Execution duration: {0} seconds\n".format(int(execute_duration)))
+    logs.write('\n\n')
     logs.close()
 
