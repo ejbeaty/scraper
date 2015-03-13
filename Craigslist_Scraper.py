@@ -9,7 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import configparser
 import datetime
-
+import os
 
 def parse_results(search_term,min_price,max_price,must_have_image,url_prefix,title_only):
     # Craigslist search URL
@@ -213,7 +213,12 @@ def send_email(email,keywords,new_records):
 if __name__ == '__main__':
     start_time = time.time()
     global logs
-    logs = open('logs','a')
+    global local_path
+    global log_path
+
+    local_path = os.path.dirname(os.path.abspath(__file__))
+    log_file = os.path.join(local_path, 'logs')
+    logs = open(log_file,'a')
 
 
     try:

@@ -76,3 +76,36 @@ Execution duration: 30 seconds
 Execution duration: 28 seconds
 
 
+||||||| Starting new search Fri Mar 13 09:58:35 2015 |||||||
+  getting active searches
+  entering loop for each search
+  Getting results for search id: 27, location: minneapolis
+    building email
+    done building email
+    logging in to smtp server
+    sending email
+    email successfully sent
+    smtp server successfully quit
+    records successfully saved
+    4 new records found for search id 27
+  Getting results for search id: 28, location: minneapolis
+    building email
+'ascii' codec can't decode byte 0xc4 in position 0: ordinal not in range(128)    done building email
+    logging in to smtp server
+    sending email
+    email successfully sent
+    smtp server successfully quit
+    records successfully saved
+    7 new records found for search id 28
+  Getting results for search id: 29, location: minneapolis
+    building email
+    done building email
+    logging in to smtp server
+    sending email
+    email successfully sent
+    smtp server successfully quit
+    records successfully saved
+    10 new records found for search id 29
+Execution duration: 53 seconds
+
+
