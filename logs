@@ -1,0 +1,134 @@
+||||||| Starting new search Thu Mar 12 18:35:04 2015 |||||||
+getting active searches
+
+interating through those searches now...
+
+enter search for each loopGetting new records
+No new records were found
+Getting new records
+Sending email
+
+building email
+
+done building email
+
+logging in to smtp server
+
+sending email
+
+email successfully sent
+smtp server successfully quit
+
+writing new records for search id: 23
+records successfully saved
+Getting new records
+No new records were found
+Getting new records
+Sending email
+
+building email
+
+done building email
+
+logging in to smtp server
+
+sending email
+
+email successfully sent
+smtp server successfully quit
+
+writing new records for search id: 25
+records successfully saved
+Getting new records
+Sending email
+
+building email
+
+done building email
+
+logging in to smtp server
+
+sending email
+
+email successfully sent
+smtp server successfully quit
+
+writing new records for search id: 26
+records successfully saved
+Execution duration: 12 seconds
+||||||| Starting new search Fri Mar 13 08:18:48 2015 |||||||
+getting active searches
+
+interating through those searches now...
+
+enter search for each loopGetting new records
+Sending email
+
+building email
+
+done building email
+
+logging in to smtp server
+
+sending email
+
+email successfully sent
+smtp server successfully quit
+
+writing new records for search id: 22
+records successfully saved
+Getting new records
+No new records were found
+Getting new records
+Sending email
+
+building email
+
+done building email
+
+logging in to smtp server
+
+sending email
+
+email successfully sent
+smtp server successfully quit
+
+writing new records for search id: 24
+records successfully saved
+Getting new records
+Sending email
+
+building email
+
+||||||| Starting new search Fri Mar 13 08:25:18 2015 |||||||
+getting active searches
+
+interating through those searches now...
+
+enter search for each loopExecution duration: 0 seconds
+||||||| Starting new search Fri Mar 13 08:28:24 2015 |||||||
+getting active searches
+interating through those searches now...
+enter loop for each search
+Execution duration: 0 seconds
+||||||| Starting new search Fri Mar 13 08:29:47 2015 |||||||
+getting active searches
+interating through those searches now...
+enter loop for each search
+Getting new records
+Sending email
+building email
+done building email
+logging in to smtp server
+sending email
+email successfully sent
+smtp server successfully quit
+writing new records for search id: 27records successfully saved
+Execution duration: 3 seconds
+||||||| Starting new search Fri Mar 13 08:30:29 2015 |||||||
+getting active searches
+interating through those searches now...
+enter loop for each search
+Getting new records
+No new records were found
+Execution duration: 1 seconds
