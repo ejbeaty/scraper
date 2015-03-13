@@ -109,3 +109,15 @@ Execution duration: 28 seconds
 Execution duration: 53 seconds
 
 
+||||||| Starting new search Fri Mar 13 10:04:28 2015 |||||||
+  getting active searches
+  entering loop for each search
+  Getting results for search id: 27, location: minneapolis
+    0 new records found for search id 27
+  Getting results for search id: 28, location: minneapolis
+    0 new records found for search id 28
+  Getting results for search id: 29, location: minneapolis
+    0 new records found for search id 29
+Execution duration: 47 seconds
+
+

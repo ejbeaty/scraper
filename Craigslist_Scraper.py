@@ -214,13 +214,14 @@ if __name__ == '__main__':
     start_time = time.time()
     global logs
     global local_path
-    global log_path
+    global log_file
+    global config_file
 
     local_path = os.path.dirname(os.path.abspath(__file__))
     log_file = os.path.join(local_path, 'logs')
+    config_file = os.path.join(local_path, 'config.ini')
+
     logs = open(log_file,'a')
-
-
     try:
 
         #get config settings
@@ -238,7 +239,7 @@ if __name__ == '__main__':
         global email_email
         global email_pass
 
-        config.read("config.ini")
+        config.read(config_file)
         db_host = config.get('databaseInfo','host')
         db_database = config.get('databaseInfo','database')
         db_user = config.get('databaseInfo','user')
