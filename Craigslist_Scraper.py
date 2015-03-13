@@ -225,7 +225,7 @@ if __name__ == '__main__':
     logger = logging.getLogger('scraper')
     logger.setLevel(logging.DEBUG)
     # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     # create file handler which logs even debug messages
     fh = logging.FileHandler(log_file)
     fh.setLevel(logging.DEBUG)
