@@ -48,7 +48,8 @@ def parse_results(search_term,min_price,max_price,must_have_image,url_prefix,tit
 def get_active_searches():
     try:
         con = mdb.connect(host=db_host, db=db_database, passwd=db_pass, user=db_user, port=db_port,charset='utf8', cursorclass=MySQLdb.cursors.DictCursor);
-        sql = "SELECT `id`,`keywords`,`price_max`,`price_min`,`must_have_image`,`title_only`,`email` FROM v_searches WHERE `status` = 'active' AND `is_verified`=1"
+
+        sql = "SELECT `id`,`description`,`keywords`,`price_max`,`price_min`,`must_have_image`,`title_only`,`email` FROM v_searches WHERE `status` = 'active' AND `is_verified`=1"
         with con:
             cur = con.cursor()
             cur.execute(sql)
@@ -63,6 +64,7 @@ def interate_through_searches(active_searches):
     for search in active_searches:
         try:
             search_id=search['id']
+            description=search['description']
             keywords = search['keywords']
             min_price=search['price_min']
             max_price=search['price_max']
@@ -87,7 +89,7 @@ def interate_through_searches(active_searches):
                 if len(new_records) > 0:
                     #logger.info("Sending email")
 
-                    send_email(email,keywords,new_records)
+                    send_email(email,description,new_records)
 
                     #logger.info('writing new records for search id: {0}'.format(search_id))
 
@@ -141,24 +143,24 @@ def get_new_records(results,search_id):
     return new_records
 
 
-def send_email(email,keywords,new_records):
+def send_email(email,description,new_records):
     # Not actually sure how this gets used or if it does
     me = "MuffinB0t"
 
     # Create message container - the correct MIME type is multipart/alternative.
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = "New results for "+keywords
+    msg['Subject'] = "New results for {0}".format(description)
     msg['From'] = me
     msg['To'] = email
 
-    text = "Hi!Here is the list of new postings for: "+keywords+""
+    text = "Hi!Here is the list of new postings for: {0}".format(description)
     html = """\
     <html>
       <head></head>
       <body>
         <p>Here is a list of new postings for:
         """
-    html=html+keywords+" <br><ul>"
+    html=html+description+" <br><ul>"
            
     
     logger.info('    building email')
