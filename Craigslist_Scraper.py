@@ -27,15 +27,18 @@ def parse_results(search_term,min_price,max_price,must_have_image,url_prefix,tit
         title_only=''
     search_term = search_term.strip().replace(' ', '+')
     search_url = BASE_URL.format(search_term,min_price,max_price,must_have_image,url_prefix,title_only)
-    #logger.info('search url: {0}'.format(search_url))
+    logger.info('search url: {0}'.format(search_url))
     #logger.info('')
     soup = BeautifulSoup(urlopen(search_url).read())
     rows = soup.find('div', 'content').find_all('p', 'row')
     for row in rows:
         if row.a['href'].startswith('http'):
             pass
+	elif row.a['href'].startswith('//'):
+	    pass
         else:
             url = 'http://{0}.craigslist.org'.format(url_prefix) + row.a['href']
+	    #logger.info('The URL I found on the page is: {0}'.format(url))
             #price = row.find('span', class_='price').get_text()
             price = ''
             create_date = row.find('time').get('datetime')
@@ -48,8 +51,8 @@ def parse_results(search_term,min_price,max_price,must_have_image,url_prefix,tit
 def get_active_searches():
     try:
         con = mdb.connect(host=db_host, db=db_database, passwd=db_pass, user=db_user, port=db_port,charset='utf8', cursorclass=MySQLdb.cursors.DictCursor);
-
-        sql = "SELECT `id`,`description`,`keywords`,`price_max`,`price_min`,`must_have_image`,`title_only`,`email` FROM v_searches WHERE `status` = 'active' AND `is_verified`=1"
+	sql = "SELECT `id`,`description`,`keywords`,`price_max`,`price_min`,`must_have_image`,`title_only`,`email` FROM v_searches WHERE `status` = 'active' AND `is_verified`=1"
+        #sql = "SELECT `id`,`description`,`keywords`,`price_max`,`price_min`,`must_have_image`,`title_only`,`email` FROM v_searches WHERE `status` = 'active' AND `is_verified`=1 and `Id`=24"
         with con:
             cur = con.cursor()
             cur.execute(sql)
@@ -115,6 +118,7 @@ def write_results(new_records,search_id):
     #database connection
     con = mdb.connect(host=db_host, db=db_database, passwd=db_pass, user=db_user, port=db_port,charset='utf8', cursorclass=MySQLdb.cursors.DictCursor);
     sql = "INSERT INTO postings(`url`,`date_posted`,`title`,`price`,`search_id`)VALUES(%(url)s,%(create_date)s,%(title)s,%(price)s,{0})".format(search_id)
+    logger.info('Saving new postings for search_id {0}: {1}'.format(new_records,search_id))
     with con:
         cur = con.cursor()
         cur.executemany(sql,new_records)
@@ -137,7 +141,7 @@ def get_new_records(results,search_id):
             #logger.info("this post exists {0} ".format(post))
             pass
         else:
-        #   logger.info("NEW POST: {0}".format(post))
+            #logger.info("NEW POST: {0}".format(post))
             new_records.append(post)
         #logger.info('')
     return new_records
